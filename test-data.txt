@@ -1,0 +1,22 @@
+00:14:00 12345 ruby ./grade4 /tmp/somefile
+00:14:00 23456 ruby ./grade4 /tmp/somefile
+00:14:00 34567 ruby ./grade4 /tmp/somefile
+00:14:00 45678 ruby ./grade4 /tmp/somefile
+00:14:00 56789 ruby ./grade4 /tmp/somefile
+34-08:19:44   922 /sbin/getty -8 38400 tty4
+34-08:19:44   926 /sbin/getty -8 38400 tty5
+34-08:19:44   930 /sbin/getty -8 38400 tty2
+34-08:19:44   931 /sbin/getty -8 38400 tty3
+34-08:19:44   933 /sbin/getty -8 38400 tty6
+34-08:19:43  1060 /sbin/getty -8 38400 tty1
+   10:10:35 13052 /bin/bash
+12-02:59:06 13401 /bin/bash
+   00:08:49 21049 ruby ./run_edx_client.rb live
+   02:07:52 21051 /home/ubuntu/.rvm/gems/ruby-1.9.3-p545/bin/spork                                                                               
+      44:30 22416 -bash
+      44:27 22518 screen -x
+      00:00 23100 ps ao etime,pid,args
+33-07:28:46 27537 /bin/bash
+33-07:28:05 27555 /bin/bash
+
+
