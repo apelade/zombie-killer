@@ -1,16 +1,15 @@
 #!/bin/bash
 # MOOC autograder zombie sweeper.
 #
-# Kill processes that match command including arguments (unlike pkill) and exceed max run time.
-# Run every 17 minutes with 'watch -n 1020 kill_zombies.sh'
-# Don't run it all the time in case it goes rogue.
+# Kill processes that match command including arguments and exceed max run time.
+# Run every 17 minutes like 'watch -n 1020 kill_zombies.sh'
 # Originally a one-liner: watch -n 1400 kill $(ps ao etime,pid,args | awk ' /[r]uby .\/grade4/ { gsub(/[:-]/,""); pid=($1 >= 700 ? $2 : ""); if (pid != "") {print pid; d=strftime("[%Y-%m-%d %H:%M:%S]",systime()); print d, pid >> "killing_zombie_process_list.log"; }} ')
-
-# Target processes older than seven minutes.
-TIMEOUT=700
 
 # Target processes that command args match this.
 REGEX='[r]uby .\/grade4'
+
+# Target processes older than seven minutes.
+TIMEOUT=700
 
 # Keep a log so you know if it's working.
 LOGFILE="killing_zombie_log.txt"
@@ -19,13 +18,10 @@ LOGFILE="killing_zombie_log.txt"
 # INT is equivalent of Ctrl+c for some processes.
 GENTLE_KILL_SIGNAL="TERM"
 
-
-###########   FIND ZOMBIES   #############
-#
-# Test with data.
-ZOMBIES=$(cat test-data.txt | \
+# Use test data.
+#ZOMBIES=$(cat test-data.txt | \
 # The real thing. Stat :sh may be useful?.
-#ZOMBIES=$(ps ao etime,pid,args | \
+ZOMBIES=$(ps ao etime,pid,args | \
 awk '
 	# Match the process command,
 	$0 ~ regex {
@@ -43,10 +39,6 @@ awk '
 	}
 # Inject bash varibles into awk.
 ' logfile=$LOGFILE timeout=$TIMEOUT regex="$REGEX")
-
-
-###########   KILL  ZOMBIES   #############
-#
 
 #todo DRY log with awk script?
 function log {
