@@ -6,39 +6,81 @@
 # Don't run it all the time in case it goes rogue.
 # Originally a one-liner: watch -n 1400 kill $(ps ao etime,pid,args | awk ' /[r]uby .\/grade4/ { gsub(/[:-]/,""); pid=($1 >= 700 ? $2 : ""); if (pid != "") {print pid; d=strftime("[%Y-%m-%d %H:%M:%S]",systime()); print d, pid >> "killing_zombie_process_list.log"; }} ')
 
-
-# Kill processes older than seven minutes.
+# Target processes older than seven minutes.
 TIMEOUT=700
 
-# Kill processes that command args match this.
+# Target processes that command args match this.
 REGEX='[r]uby .\/grade4'
-
 
 # Keep a log so you know if it's working.
 LOGFILE="killing_zombie_log.txt"
 
+# Varies by application. We use TERM.
+# INT is equivalent of Ctrl+c for some processes.
+GENTLE_KILL_SIGNAL="TERM"
 
+
+###########   FIND ZOMBIES   #############
+#
 # Test with data.
-#ZOMBIES=$(cat test-data.txt | awk '
-# The real thing.
-ZOMBIES=$(ps ao etime,pid,args | awk '
-	# match process command
+ZOMBIES=$(cat test-data.txt | \
+# The real thing. Stat :sh may be useful?.
+#ZOMBIES=$(ps ao etime,pid,args | \
+awk '
+	# Match the process command,
 	$0 ~ regex {
-                 # remove punctuation for compare vs timeout
+                 # remove punctuation for compare vs timeout,
 		 gsub(/[:-]/,"");
                  elapsed=$1;
                  pid=$2;
-                 if (elapsed >= timeout ) {
-                        # yield pid for kill list
+                 if ( elapsed >= timeout ) {
+                        # yield pid for kill list,
                  	print pid;
-		        # log it
+		        # and log it.
 			timestamp=strftime("[%Y-%m-%d %H:%M:%S]",systime());
 			print timestamp, elapsed, pid >> logfile;
 		 }
 	}
+# Inject bash varibles into awk.
 ' logfile=$LOGFILE timeout=$TIMEOUT regex="$REGEX")
 
-# Be aware of how your application traps shutdown signals.
-kill $ZOMBIES
-sleep 1
-kill -9 $ZOMBIES
+
+###########   KILL  ZOMBIES   #############
+#
+
+#todo DRY log with awk script?
+function log {
+  touch $LOGFILE;
+  echo $1 >> $LOGFILE;
+}
+
+function running {
+  pid=$1
+  if [ -n "$(ps --no-headers -p $pid -o etime,pid,args)" ]
+  then
+    true;
+  else
+    false;
+  fi
+}
+
+# Kill process ids with increasing insistence.
+for pid in $ZOMBIES
+do
+  if ! running $pid;then
+    log "Attempt to kill process not found: $pid"
+  else
+    log "kill $pid"
+    kill -s $GENTLE_KILL_SIGNAL $pid;
+    sleep 5;
+    if running $pid;then
+      log "Process survived signal TERM: $pid Escalate.";
+      sleep 15;
+      kill -s KILL $pid;
+      sleep 5;
+      if running $pid;then
+        log "Process cannot be killed: $pid";
+      fi
+    fi
+  fi
+done
