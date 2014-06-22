@@ -3,6 +3,8 @@ zombie-killer
 script to terminate zombie processes by staleness and match on command arguments
 
 - Kill processes that match command including arguments (unlike pkill) and exceed max run time.
+- Edit kill-zombies.sh to change timeout, regex, and log file.
+- Test by uncommenting the input from test-data.txt.
 - Run every 17 minutes with 'watch -n 1020 kill_zombies.sh'
 - Don't run it all the time in case it goes rogue.
 - Originally a one-liner:
