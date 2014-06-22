@@ -3,6 +3,7 @@
 #
 # Kill processes that match command including arguments and exceed max run time.
 # Run every 17 minutes like 'watch -n 1020 kill_zombies.sh'
+# Set constants below.
 # Originally a one-liner: watch -n 1400 kill $(ps ao etime,pid,args | awk ' /[r]uby .\/grade4/ { gsub(/[:-]/,""); pid=($1 >= 700 ? $2 : ""); if (pid != "") {print pid; d=strftime("[%Y-%m-%d %H:%M:%S]",systime()); print d, pid >> "killing_zombie_process_list.log"; }} ')
 
 # Target processes that command args match this.
@@ -38,7 +39,8 @@ awk '
 		 }
 	}
 # Inject bash varibles into awk.
-' logfile=$LOGFILE timeout=$TIMEOUT regex="$REGEX")
+' logfile=$LOGFILE timeout=$TIMEOUT regex="$REGEX"
+)
 
 #todo DRY log with awk script?
 function log {
@@ -49,10 +51,8 @@ function log {
 function running {
   pid=$1
   if [ -n "$(ps --no-headers -p $pid -o etime,pid,args)" ]
-  then
-    true;
-  else
-    false;
+    then true;
+    else false;
   fi
 }
 
