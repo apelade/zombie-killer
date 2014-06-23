@@ -51,8 +51,8 @@ function log {
 function running {
   pid=$1
   if [ -n "$(ps --no-headers -p $pid -o etime,pid,args)" ]
-    then true;
-    else false;
+  then true;
+  else false;
   fi
 }
 
