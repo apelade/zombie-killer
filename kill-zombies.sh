@@ -6,46 +6,39 @@
 # Set constants below.
 # Originally a one-liner: watch -n 1400 kill $(ps ao etime,pid,args | awk ' /[r]uby .\/grade4/ { gsub(/[:-]/,""); pid=($1 >= 700 ? $2 : ""); if (pid != "") {print pid; d=strftime("[%Y-%m-%d %H:%M:%S]",systime()); print d, pid >> "killing_zombie_process_list.log"; }} ')
 
-# Target processes that command args match this.
 REGEX='[r]uby .\/grade4'
-
-# Target processes older than seven minutes.
 TIMEOUT=700
+LOGFILE='killing_zombie_log.txt'
+GENTLE_KILL_SIGNAL='TERM'
 
-# Keep a log so you know if it's working.
-LOGFILE="killing_zombie_log.txt"
-
-# Varies by application. We use TERM.
-# INT is equivalent of Ctrl+c for some processes.
-GENTLE_KILL_SIGNAL="TERM"
-
-# Use test data.
+# Run test data
 #ZOMBIES=$(cat test-data.txt | \
-# The real thing. Stat :sh may be useful?.
+
+# Find all matching old processes.
 ZOMBIES=$(ps ao etime,pid,args | \
 awk '
-	# Match the process command,
+	# match process command
 	$0 ~ regex {
-                 # remove punctuation for compare vs timeout,
+                 # remove punctuation from elapsed
 		 gsub(/[:-]/,"");
                  elapsed=$1;
                  pid=$2;
                  if ( elapsed >= timeout ) {
-                        # yield pid for kill list,
+                        # yield pid to kill list
                  	print pid;
-		        # and log it.
+		        # and log
 			timestamp=strftime("[%Y-%m-%d %H:%M:%S]",systime());
 			print timestamp, elapsed, pid >> logfile;
 		 }
 	}
-# Inject bash varibles into awk.
+# inject bash varibles to awk
 ' logfile=$LOGFILE timeout=$TIMEOUT regex="$REGEX"
 )
 
-#todo DRY log with awk script?
 function log {
+  message = $1
   touch $LOGFILE;
-  echo $1 >> $LOGFILE;
+  echo $message >> $LOGFILE;
 }
 
 function running {
@@ -56,7 +49,7 @@ function running {
   fi
 }
 
-# Kill process ids with increasing insistence.
+# Kill with increasing insistence.
 for pid in $ZOMBIES
 do
   if ! running $pid;then
