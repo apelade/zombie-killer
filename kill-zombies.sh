@@ -7,6 +7,7 @@
 # Originally a one-liner: watch -n 1400 kill $(ps ao etime,pid,args | awk ' /[r]uby .\/grade4/ { gsub(/[:-]/,""); pid=($1 >= 700 ? $2 : ""); if (pid != "") {print pid; d=strftime("[%Y-%m-%d %H:%M:%S]",systime()); print d, pid >> "killing_zombie_process_list.log"; }} ')
 
 REGEX='[r]uby .\/grade4'
+# Time is in minutes:seconds. 700 is 7 minutes.
 TIMEOUT=700
 LOGFILE='killing_zombie_log.txt'
 GENTLE_KILL_SIGNAL='TERM'
