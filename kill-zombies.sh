@@ -60,7 +60,7 @@ do
     kill -s $GENTLE_KILL_SIGNAL $pid;
     sleep 5;
     if running $pid;then
-      log "Process survived signal TERM: $pid Escalate.";
+      log "Process $pid survived signal $GENTLE_KILL_SIGNAL : Escalate.";
       sleep 15;
       kill -s KILL $pid;
       sleep 5;
